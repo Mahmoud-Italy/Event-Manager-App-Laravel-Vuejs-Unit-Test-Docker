@@ -1,0 +1,11 @@
+@font-face {
+                font-family: Jozoor;
+                font-weight: 100 !important;
+                src: url("./AraJozoor-Regular.otf");
+                src: url("./AraJozoor-Regular.ttf");
+                src: url("./Web_Font/font/AraJozoor-Regular.eot") format('eot'),
+                      url("./Web_Font/font/AraJozoor-Regular.woff") format("woff"),
+                      url("./Web_Font/font/AraJozoor-Regular.ttf") format("truetype"),
+                      url("./Web_Font/font/AraJozoor-Regular.svg") format("svg")
+            }
+ .fontana { font-family: 'Jozoor' !important; font-weight: 100 !important }
