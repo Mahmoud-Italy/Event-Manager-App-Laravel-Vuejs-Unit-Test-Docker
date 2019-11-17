@@ -1,49 +1,36 @@
 version: '3'
 services:
 
-  #PHP Service
-  app:
+  web:
     build:
       context: .
-      dockerfile: docker/web/Dockerfile
-    image: digitalocean.com/php
-    container_name: app
-    restart: unless-stopped
-    tty: true
-    environment:
-      SERVICE_NAME: app
-      SERVICE_TAGS: dev
-    working_dir: /var/www
-    volumes:
-      - ./:/var/www
-      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
-    networks:
-      - app-network
-
-  #MySQL Service
-  db:
-    image: mysql:5.7.22
-    container_name: db
-    restart: unless-stopped
-    tty: true
+      dockerfile: .docker/web/Dockerfile
     ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: your_mysql_root_password
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+      - 80:80
     volumes:
-      - dbdata:/var/lib/mysql/
-      - ./mysql/my.cnf:/etc/mysql/my.cnf
-    networks:
-      - app-network
+      - .:/var/www/html
 
-#Docker Networks
-networks:
-  app-network:
-    driver: bridge
-#Volumes
-volumes:
-  dbdata:
-    driver: local
+  node:
+    build:
+      context: .
+      dockerfile: .docker/node/Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/home/node/app
+    user: "node"
+    working_dir: /home/node/app
+
+  mysql:
+    build:
+      context: .
+      dockerfile: .docker/mysql/Dockerfile
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=eventApp_DB"
+      - "MYSQL_USER=root"
+      - "MYSQL_PASSWORD=root"
+      - "MYSQL_ROOT_PASSWORD=root"
+    ports:
+        - "33061:3306"

@@ -7,7 +7,7 @@ RUN apt-get update \
  && docker-php-ext-enable xdebug \
  && echo 'xdebug.remote_enable=on' >> /usr/local/etc/php/conf.d/xdebug.ini \
  && echo 'xdebug.remote_host=host.docker.internal' >> /usr/local/etc/php/conf.d/xdebug.ini \
- && echo 'xdebug.remote_port=9000' >>  /usr/local/etc/php/conf.d/xdebug.ini \
+ && echo 'xdebug.remote_port=8000' >>  /usr/local/etc/php/conf.d/xdebug.ini \
  && a2enmod rewrite \
  && sed -i 's!/var/www/html!/var/www/public!g' /etc/apache2/sites-available/000-default.conf \
  && mv /var/www/html /var/www/public \
