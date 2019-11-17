@@ -13,15 +13,11 @@
               <p>It comes with a simple and logically organized file structure for easy to understand and maintainability.</p>
               <textarea rows="4" cols="50" class="code-non-editable">
 ├── AUTHENTICATION/
-
     ├── Register/
     ├── Login/
-
 ├── DASHBOARD/
-
   ├── MAIN/
     ├── Dashboard/
-    
   ├── EVENTS/
     ├── Meetings/
     ├── Calls/

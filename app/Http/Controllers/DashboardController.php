@@ -51,13 +51,25 @@ class DashboardController extends Controller
 
     public function rowStatus(Request $request)
     {
-    		$namespace = '\\App\\';
-    		$model = $namespace . $request->modelName;
-    		if($model::where('id', $request->rowId)->count()) {
-	    	$row = $model::where('id', $request->rowId)->first();
-	    	$row->status = ($row->status == 1) ? 0 : 1;
-	    	$row->save();
+        $statusCode = 500;
+        $err = NULL;
+        $namespace = '\\App\\';
+        $model = $namespace . $request->modelName;
+
+        if(self::hasToken($request->accessToken)) { $err = self::hasToken($request->accessToken); }
+        else if (!$model::where('id', $request->rowId)->count()) { $err = 'No data found.'; }
+        else if ($request->modelName != 'User' && !$model::where(['id'=> $request->rowId, 'user_id'=>Helper::whoIs($request->accessToken)])->count() &&
+                 !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only update status your own data.'; }
+        else if ($request->modelName == 'User' && !$model::where(['id'=> $request->rowId, 'id'=>Helper::whoIs($request->accessToken)])->count() &&
+                 !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only update status your own data.'; }
+        else {
+    		  if($model::where('id', $request->rowId)->count()) {
+    	    	$row = $model::where('id', $request->rowId)->first();
+    	    	$row->status = ($row->status == 1) ? 0 : 1;
+    	    	$row->save();
+                $statusCode = 200;
 	    	}
+        }
     	return response()->json(['statusCode'=>200]);
     }
 

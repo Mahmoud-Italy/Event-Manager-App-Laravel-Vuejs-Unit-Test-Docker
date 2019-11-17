@@ -83,8 +83,8 @@ class MeetingController extends Controller
         if(self::hasToken($request->accessToken)) { $err = self::hasToken($request->accessToken); }
         else if(strtotime(Helper::dateFormat($request->start_dateTime)) >= strtotime(Helper::dateFormat($request->end_dateTime))) { $err = 'Invalid  dateTime period.'; }
         else if($request->isMethod('put') && !Meeting::where('id', $request->meeting_id)->count()) { $err = 'No data found.'; }
-        else if ($request->isMethod('put') && !Meeting::where(['id'=>$request->meeting_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count()) 
-            { $err = 'You can only edit your own data.'; }
+        else if ($request->isMethod('put') && !Meeting::where(['id'=>$request->meeting_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count() &&
+                !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only update your own data.'; }
         else {
             try {
                 if($request->isMethod('put')) $row = Meeting::findOrFail($request->meeting_id);
@@ -121,7 +121,8 @@ class MeetingController extends Controller
 
         if(self::hasToken($request->accessToken)) { $err = self::hasToken($request->accessToken); }
         else if(!Meeting::where('id', $request->meeting_id)->count()) { $err = 'No data found.'; }
-        else if (!Meeting::where(['id'=>$request->meeting_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count()) { $err = 'You can only edit your own data.'; }
+        else if (!Meeting::where(['id'=>$request->meeting_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count() &&
+                  !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only edit your own data.'; }
         else {
             $row = new MeetingResource(Meeting::findOrFail($request->meeting_id));
             $members = MemberResource::collection(DB::table('meeting_members as m')
@@ -146,7 +147,8 @@ class MeetingController extends Controller
 
         if(self::hasToken($request->accessToken)) { $err = self::hasToken($request->accessToken); }
         else if(!Meeting::where('id', $request->meeting_id)->count()) { $err = 'No data found.'; }
-        else if (!Meeting::where(['id'=>$request->meeting_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count()) {  $err = 'You can only delete your own data.'; }
+        else if (!Meeting::where(['id'=>$request->meeting_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count() &&
+                  !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only delete your own data.'; }
         else {
             $row = Meeting::findOrFail($request->meeting_id);
                 if($row->image) { \File::Delete($row->image); }
@@ -172,7 +174,8 @@ class MeetingController extends Controller
         else if(!$request->meeting_id) { $err = 'meeting_id is required.'; }
         else if(!User::where('id', $request->user_id)->count()) { $err = 'user_id not found.'; }
         else if(!Meeting::where('id', $request->meeting_id)->count()) { $err = 'meeting_id not found.'; }
-        else if(!Meeting::where(['id'=>$request->meeting_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count()) {  $err = 'You can only invite to your own event.'; }
+        else if (!Meeting::where(['id'=>$request->meeting_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count() &&
+                  !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only invite your own event.'; }
         else if(Meeting_member::where('meeting_id', $request->meeting_id)->count() > 4) { $err = 'No more available slots.'; }
         else if(Meeting_member::where(['meeting_id'=> $request->meeting_id, 'user_id'=> $request->user_id])->count()) { $err = 'user_id already exists.'; }
         else {
@@ -202,7 +205,8 @@ class MeetingController extends Controller
         else if(!$request->meeting_id) { $err = 'meeting_id is required.'; }
         else if(!User::where('id', $request->user_id)->count()) { $err = 'user_id not found.'; }
         else if(!Meeting::where('id', $request->meeting_id)->count()) { $err = 'meeting_id not found.'; }
-        else if(!Meeting::where(['id'=>$request->meeting_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count()) {  $err = 'You can only remove from your own event.'; }
+        else if (!Meeting::where(['id'=>$request->meeting_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count() &&
+                  !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only remove from your own event.'; }
         else if(!Meeting_member::where(['meeting_id'=> $request->meeting_id, 'user_id'=>$request->user_id])->count()) { $err = 'No data found.'; }
         else {
             try {

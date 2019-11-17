@@ -83,8 +83,8 @@ class CallController extends Controller
         if(self::hasToken($request->accessToken)) { $err = self::hasToken($request->accessToken); }
         else if(strtotime(Helper::dateFormat($request->start_dateTime)) >= strtotime(Helper::dateFormat($request->end_dateTime))) { $err = 'Invalid  dateTime period.'; }
         else if($request->isMethod('put') && !Call::where('id', $request->call_id)->count()) { $err = 'No data found.'; }
-        else if ($request->isMethod('put') && !Call::where(['id'=>$request->call_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count()) 
-            { $err = 'You can only edit your own data.'; }
+        else if ($request->isMethod('put') && !Call::where(['id'=>$request->call_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count() &&
+                !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only update your own data.'; }
         else {
             try {
                 if($request->isMethod('put')) $row = Call::findOrFail($request->call_id);
@@ -120,7 +120,8 @@ class CallController extends Controller
 
         if(self::hasToken($request->accessToken)) { $err = self::hasToken($request->accessToken); }
         else if(!Call::where('id', $request->call_id)->count()) { $err = 'No data found.'; }
-        else if (!Call::where(['id'=>$request->call_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count()) { $err = 'You can only edit your own data.'; }
+        else if (!Call::where(['id'=>$request->call_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count() && 
+                 !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only edit your own data.'; } 
         else {
             $row = new CallResource(Call::findOrFail($request->call_id));
             $members = MemberResource::collection(DB::table('call_members as m')
@@ -145,7 +146,8 @@ class CallController extends Controller
 
         if(self::hasToken($request->accessToken)) { $err = self::hasToken($request->accessToken); }
         else if(!Call::where('id', $request->call_id)->count()) { $err = 'No data found.'; }
-        else if (!Call::where(['id'=>$request->call_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count()) {  $err = 'You can only delete your own data.'; }
+        else if (!Call::where(['id'=>$request->call_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count() && 
+                 !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only delete your own data.'; } 
         else {
             $row = Call::findOrFail($request->call_id);
                 if($row->image) { \File::Delete($row->image); }
@@ -171,7 +173,8 @@ class CallController extends Controller
         else if(!$request->call_id) { $err = 'call_id is required.'; }
         else if(!User::where('id', $request->user_id)->count()) { $err = 'user_id not found.'; }
         else if(!Call::where('id', $request->call_id)->count()) { $err = 'call_id not found.'; }
-        else if(!Call::where(['id'=>$request->call_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count()) {  $err = 'You can only invite to your own event.'; }
+        else if (!Call::where(['id'=>$request->call_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count() && 
+                 !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only invite to your own event.'; } 
         else if(Call_member::where('call_id', $request->call_id)->count() > 2) { $err = 'No more available slots.'; }
         else if(Call_member::where(['call_id'=> $request->call_id, 'user_id'=> $request->user_id])->count()) { $err = 'user_id already exists.'; }
         else {
@@ -201,7 +204,8 @@ class CallController extends Controller
         else if(!$request->call_id) { $err = 'call_id is required.'; }
         else if(!User::where('id', $request->user_id)->count()) { $err = 'user_id not found.'; }
         else if(!Call::where('id', $request->call_id)->count()) { $err = 'call_id not found.'; }
-        else if(!Call::where(['id'=>$request->call_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count()) {  $err = 'You can only remove from your own event.'; }
+        else if (!Call::where(['id'=>$request->call_id, 'user_id'=> Helper::whoIs($request->accessToken)])->count() && 
+                 !Helper::fetchUser(Helper::whoIs($request->accessToken), 'role_id')) { $err = 'You can only remove from your own event.'; } 
         else if(!Call_member::where(['call_id'=> $request->call_id, 'user_id'=>$request->user_id])->count()) { $err = 'No data found.'; }
         else {
             try {
