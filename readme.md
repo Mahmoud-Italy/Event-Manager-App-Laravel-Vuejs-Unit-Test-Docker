@@ -1,7 +1,7 @@
 # Event Manager App
 
 <i>this repository for a simple Event Manager app using Laravel - VueJs - Unit Test - Docker</i>
-
+ 
 <b>Demo:</b> 
 https://www.loom.com/share/11a16fba642c43a69f471fbb72e68e12
 
