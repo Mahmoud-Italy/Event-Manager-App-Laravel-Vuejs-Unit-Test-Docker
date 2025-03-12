@@ -12,6 +12,6 @@ https://www.loom.com/share/11a16fba642c43a69f471fbb72e68e12
 <li> composer update</li>
 <li> npm install</li>
 <li> php artisan migrate</li> 
-<li> php artisan serve</li> 
+<li> php artisan serve</li>  
 <li> Have fun ~_^ </li> 
 </ul>
